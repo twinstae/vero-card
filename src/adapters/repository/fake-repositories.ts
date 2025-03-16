@@ -3,7 +3,7 @@ import type { LearningHistory } from '../../domain/learning-history';
 import type { Problem } from '../../domain/problem';
 
 // interface contract 계약
-interface ICardRepository {
+export interface ICardRepository {
     // query
     getAllCardList(): Promise<Card[]>
     // mutation
@@ -23,9 +23,10 @@ export function createFakeCardRepository(initState: Map<string, Card>): ICardRep
     }
 }
 
-interface IProblemRepository {
+export interface IProblemRepository {
     // query
     getAllProblemList(): Promise<Problem[]>
+    getProblemById(problemId: string): Promise<Problem | undefined>;
     // mutation
     createProblem(newProblem: Problem): Promise<void>;
     // update ?
@@ -38,6 +39,9 @@ export function createFakeProblemRepository(initState: Map<string, Problem>): IP
         async getAllProblemList(): Promise<Problem[]> {
             return [...stateMap.values()];
         },
+        async getProblemById(problemId){
+            return stateMap.get(problemId);
+        },
         // mutation
         async createProblem(newProblem: Problem): Promise<void> {
             stateMap.set(newProblem.id, newProblem);
@@ -46,7 +50,7 @@ export function createFakeProblemRepository(initState: Map<string, Problem>): IP
 }
 
 
-interface ILearningHistoryRepository {
+export interface ILearningHistoryRepository {
     // query
     getLearningHistoryListByLearnerId(learnerId: string): Promise<LearningHistory[]>
     getLearningHistoryListByCardIdAndLearnerId(cardId: string, learnerId: string): Promise<LearningHistory[]>
