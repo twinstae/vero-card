@@ -5,7 +5,7 @@ export const YesOrNoProblem = {
   cardId: "card-1",
   type: "yes-or-no",
   content: {
-    question: "임치 계약의 소멸시효는 계약이 시작된 시",
+    question: "임치 계약의 소멸시효는 계약이 시작된 시점에 시작한다는 것이 판례의 태도이다",
     answer: true,
   }
 }

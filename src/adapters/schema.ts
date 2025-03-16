@@ -1,6 +1,6 @@
 import * as v from 'valibot';
 
-const dateStringSchema = v.pipe(
+export const dateStringSchema = v.pipe(
   v.string(),
   v.isoTimestamp('The date is badly formatted.')
 );

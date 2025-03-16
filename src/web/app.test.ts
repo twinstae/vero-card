@@ -16,7 +16,7 @@ const client = {
     return res.json();
   },
   async post(path: string, body: any) {
-    return app.fetch(
+    const res = await app.fetch(
       new Request(HOST + path, {
         method: 'POST',
         headers: {
@@ -25,6 +25,12 @@ const client = {
         body: JSON.stringify(body),
       })
     );
+
+    if (res.status !== 201) {
+      return Promise.reject(path + ' : ' + (await res.text()));
+    }
+
+    return res;
   },
 };
 
@@ -42,7 +48,7 @@ describe('cards api', () => {
 });
 
 describe('problems api', () => {
-  test('카드를 생성하고 읽어올 수 있다', async () => {
+  test('문제를 생성하고 읽어올 수 있다', async () => {
     // given
     expect(await client.get('/problems')).toStrictEqual([]);
 
@@ -51,5 +57,22 @@ describe('problems api', () => {
 
     // then
     expect(await client.get('/problems')).toStrictEqual([YesOrNoProblem]);
+  });
+
+  test('문제를 풀 수 있다', async () => {
+    // given
+    expect(await client.get('/problems')).toStrictEqual([YesOrNoProblem]);
+
+    // when
+    expect(
+      (
+        await client.post('/problems/' + YesOrNoProblem.id + '/solve', {
+          id: 'solve-1',
+          answer: 'O',
+          isRight: true,
+          createdAt: new Date().toISOString(),
+        })
+      ).status
+    ).toBe(201);
   });
 });
