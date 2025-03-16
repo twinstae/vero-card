@@ -1,10 +1,10 @@
 import { Hono } from 'hono';
-import { describeRoute } from 'hono-openapi';
+import { describeRoute, openAPISpecs } from 'hono-openapi';
 import { resolver, validator as vValidator } from 'hono-openapi/valibot';
+import { apiReference } from '@scalar/hono-api-reference'
 import * as v from 'valibot';
 import { createFakeCardRepository } from '../adapters/repository/fake-repositories';
 import { CardSchema } from '../adapters/schema';
-import { apiReference } from '@scalar/hono-api-reference'
 
 const cardRepo = createFakeCardRepository(new Map());
 
@@ -52,11 +52,10 @@ app.post(
         createdAt: new Date(newCard.createdAt)
       });
 
-      return c.status(201);
+      return new Response("", { status: 201 });
     }
 )
 
-import { openAPISpecs } from 'hono-openapi'
 
 app.get(
   '/openapi',
@@ -82,5 +81,7 @@ app.get(
     spec: { url: '/openapi' },
   })
 )
+
+export default app;
 
 Bun.serve({ fetch: app.fetch });

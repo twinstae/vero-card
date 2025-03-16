@@ -2,7 +2,7 @@ import * as v from 'valibot';
 
 const dateStringSchema = v.pipe(
     v.string(),
-    v.isoDateTime('The date is badly formatted.')
+    v.isoTimestamp('The date is badly formatted.')
 );
 
 export const CardSchema = v.object({
