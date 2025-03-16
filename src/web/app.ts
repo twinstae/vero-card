@@ -1,61 +1,15 @@
 import { Hono } from 'hono';
-import { describeRoute, openAPISpecs } from 'hono-openapi';
-import { resolver, validator as vValidator } from 'hono-openapi/valibot';
-import { apiReference } from '@scalar/hono-api-reference'
-import * as v from 'valibot';
-import { createFakeCardRepository } from '../adapters/repository/fake-repositories';
-import { CardSchema } from '../adapters/schema';
-
-const cardRepo = createFakeCardRepository(new Map());
+import { openAPISpecs } from 'hono-openapi';
+import { apiReference } from '@scalar/hono-api-reference';
+import cardsRoutes from './cards';
+import problemsRoutes from './problems';
 
 const app = new Hono();
 
-app.get(
-  '/cards',
-  describeRoute({
-    description: '모든 카드 목록을 반환합니다',
-    responses: {
-      200: {
-        description: 'Successful response',
-        content: {
-          'application/json': {
-            schema: resolver(
-              v.array(CardSchema)
-            ),
-          },
-        },
-      },
-    },
-  }),
-  async (c) => {
-    const cardList = await cardRepo.getAllCardList();
-    return c.json(cardList);
-  }
-);
-
-app.post(
-    '/cards',
-    describeRoute({
-      description: '새 카드를 생성합니다',
-      responses: {
-        201: {
-          description: 'Successfully created!',
-        },
-      },
-    }),
-    vValidator('json', CardSchema),
-    async (c) => {
-      const newCard = c.req.valid('json')
-      
-      await cardRepo.createCard({
-        ...newCard,
-        createdAt: new Date(newCard.createdAt)
-      });
-
-      return new Response("", { status: 201 });
-    }
-)
-
+ // "/cards"
+app.route('/', cardsRoutes);
+// "/problems"
+app.route('/', problemsRoutes);
 
 app.get(
   '/openapi',
@@ -66,13 +20,10 @@ app.get(
         version: '0.0.1',
         description: 'Greeting API',
       },
-      servers: [
-        { url: 'http://localhost:3000', description: 'Local Server' },
-      ],
+      servers: [{ url: 'http://localhost:3000', description: 'Local Server' }],
     },
   })
-)
-
+);
 
 app.get(
   '/docs',
@@ -80,7 +31,7 @@ app.get(
     theme: 'saturn',
     spec: { url: '/openapi' },
   })
-)
+);
 
 export default app;
 
