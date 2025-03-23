@@ -1,10 +1,4 @@
-export type SolutionRecord = {
-  learnerId: string;
-  problemId: string;
-  cardId: string;
-  result: 'correct' | 'wrong';
-  solvedAt: Date;
-};
+import type { LearningHistory } from "./learning-history";
 
 export type ProficiencyLevel = 0 | 1 | 2 | 3 | 4 | 5;
 
@@ -17,12 +11,12 @@ export function assertValidProficiencyLevel(n: number): ProficiencyLevel {
 }
 
 export function calculateLevel(
-  solutionRecordList: SolutionRecord[]
+  learningHistoryList: LearningHistory[]
 ): ProficiencyLevel {
-  return [...solutionRecordList]
-    .sort((a, b) => a.solvedAt.valueOf() - b.solvedAt.valueOf())
-    .reduce((acc, solutionRecord) => {
-      if (solutionRecord.result === 'correct') {
+  return [...learningHistoryList]
+    .sort((a, b) => a.createdAt.valueOf() - b.createdAt.valueOf())
+    .reduce((acc, learningHistory) => {
+      if (learningHistory.isRight === true) {
         if (acc >= 5) {
           return 5;
         }
@@ -30,7 +24,7 @@ export function calculateLevel(
         return assertValidProficiencyLevel(acc + 1);
       }
 
-      if (solutionRecord.result === 'wrong') {
+      if (learningHistory.isRight === false) {
         if (acc <= 0) {
           return 0;
         }

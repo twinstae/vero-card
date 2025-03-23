@@ -56,7 +56,7 @@ problemsRoutes.post(
 );
 
 problemsRoutes.post(
-  '/problems/:problemId/solve',
+  '/problems/:problemId/learning-histories',
   describeRoute({
     description: '어떤 문제 하나를 학습합니다',
     responses: {

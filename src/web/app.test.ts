@@ -66,7 +66,7 @@ describe('problems api', () => {
     // when
     expect(
       (
-        await client.post('/problems/' + YesOrNoProblem.id + '/solve', {
+        await client.post('/problems/' + YesOrNoProblem.id + '/learning-histories', {
           id: 'solve-1',
           answer: 'O',
           isRight: true,

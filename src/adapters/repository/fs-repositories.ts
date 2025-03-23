@@ -29,7 +29,7 @@ export async function createFsCardRepository(): Promise<ICardRepository> {
             return [...store.values()];
         },
         async createCard(newCard: Card): Promise<void> {
-            store.set(newCard.id, newCard);
+            return store.set(newCard.id, newCard);
         }
     }
 }
@@ -45,7 +45,7 @@ export async function createFsProblemRepository(): Promise<IProblemRepository> {
             return store.get(problemId);
         },
         async createProblem(newProblem: Problem): Promise<void> {
-            store.set(newProblem.id, newProblem);
+            return store.set(newProblem.id, newProblem);
         }
     }
 }
@@ -66,7 +66,7 @@ export async function createFsLearningHistoryRepository(initState: Map<string, L
                 .filter(item => item.learnerId === learnerId);
         },
         async createLearningHistory(newLearningHistory: LearningHistory): Promise<void> {
-            store.set(newLearningHistory.id, newLearningHistory);
+            return store.set(newLearningHistory.id, newLearningHistory);
         }
     }
 }

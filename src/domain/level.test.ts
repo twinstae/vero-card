@@ -2,37 +2,43 @@ import { describe, expect, test } from 'bun:test';
 import {
   assertValidProficiencyLevel,
   calculateLevel,
-  type SolutionRecord,
 } from './level';
+import type { LearningHistory } from './learning-history';
 
 const testLearnerId = 'a'; // "김태희"
 const testCardId = '1'; // 조건과 친하지 않은 행위
 const testProblemId = 'x1ad'; // "다음 중 조건과 친하지 않은 행위인 것은?"
 const testProblemId2 = 'y2hd'; // "다음 중 조건과 친한 행위인 것은?"
 
-const 맞은_풀이기록: SolutionRecord = {
+const 맞은_풀이기록: LearningHistory = {
   learnerId: testLearnerId,
   problemId: testProblemId,
   cardId: testCardId,
-  result: 'correct',
-  solvedAt: new Date('2024-01-01T00:00:00Z'),
+  isRight: true,
+  createdAt: new Date('2024-01-01T00:00:00Z'),
+  id: 'solve-1',
+  answer: '혼인 신고'
 };
 
 const 틀린_풀이기록 = {
   learnerId: testLearnerId,
   problemId: testProblemId2,
   cardId: testCardId,
-  result: 'wrong',
-  solvedAt: new Date('2024-01-01T00:00:00Z'),
-} satisfies SolutionRecord;
+  isRight: false,
+  createdAt: new Date('2024-01-01T00:00:00Z'),
+  id: 'solve-2',
+  answer: '혼인 신고'
+} satisfies LearningHistory;
 
 const 예전_틀린_풀이기록 = {
   learnerId: testLearnerId,
   problemId: testProblemId2,
   cardId: testCardId,
-  result: 'wrong',
-  solvedAt: new Date('2023-12-31T00:00:00Z'),
-} satisfies SolutionRecord;
+  isRight: false,
+  createdAt: new Date('2023-12-31T00:00:00Z'),
+  id: 'solve-3',
+  answer: '혼인 신고'
+} satisfies LearningHistory;
 
 describe('level', () => {
   test('숙련도는 0 1 2 3 4 5 만 가능하다', () => {
