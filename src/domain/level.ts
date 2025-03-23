@@ -1,10 +1,17 @@
 import type { LearningHistory } from "./learning-history";
 
-export type ProficiencyLevel = 0 | 1 | 2 | 3 | 4 | 5;
+export type ProficiencyLevelValue = 0 | 1 | 2 | 3 | 4 | 5;
 
-export function assertValidProficiencyLevel(n: number): ProficiencyLevel {
+export type ProficiencyLevel = {
+  learnerId: string;
+  cardId: string;
+  value: ProficiencyLevelValue;
+  updatedAt: Date;
+}
+
+export function assertValidProficiencyLevel(n: number): ProficiencyLevelValue {
   if ([0, 1, 2, 3, 4, 5].includes(n)) {
-    return n as ProficiencyLevel;
+    return n as ProficiencyLevelValue;
   }
 
   throw Error(n + '은 0,1,2,3,4,5 가 아닙니다!');
@@ -12,7 +19,7 @@ export function assertValidProficiencyLevel(n: number): ProficiencyLevel {
 
 export function calculateLevel(
   learningHistoryList: LearningHistory[]
-): ProficiencyLevel {
+): ProficiencyLevelValue {
   return [...learningHistoryList]
     .sort((a, b) => a.createdAt.valueOf() - b.createdAt.valueOf())
     .reduce((acc, learningHistory) => {
@@ -33,5 +40,5 @@ export function calculateLevel(
       }
 
       return acc;
-    }, 0 as ProficiencyLevel);
+    }, 0 as ProficiencyLevelValue);
 }

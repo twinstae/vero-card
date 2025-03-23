@@ -1,5 +1,6 @@
 import type { Card } from '../../domain/card';
 import type { LearningHistory } from '../../domain/learning-history';
+import type { ProficiencyLevel } from '../../domain/level';
 import type { Problem } from '../../domain/problem';
 
 // interface contract 계약
@@ -53,7 +54,10 @@ export function createFakeProblemRepository(initState: Map<string, Problem>): IP
 export interface ILearningHistoryRepository {
     // query
     getLearningHistoryListByLearnerId(learnerId: string): Promise<LearningHistory[]>
-    getLearningHistoryListByCardIdAndLearnerId(cardId: string, learnerId: string): Promise<LearningHistory[]>
+    getLearningHistoryListByLearnerIdAndCardId(params: {
+        learnerId: string,
+        cardId: string
+    }): Promise<LearningHistory[]>
     // mutation
     createLearningHistory(newLearningHistory: LearningHistory): Promise<void>;
 }
@@ -66,13 +70,33 @@ export function createFakeLearningHistoryRepository(initState: Map<string, Learn
             return [...stateMap.values()]
                 .filter(item => item.learnerId === learnerId);
         },
-        async getLearningHistoryListByCardIdAndLearnerId(cardId: string, learnerId: string): Promise<LearningHistory[]> {
+        async getLearningHistoryListByLearnerIdAndCardId({ learnerId, cardId }): Promise<LearningHistory[]> {
             return [...stateMap.values()]
                 .filter(item => item.cardId === cardId)
                 .filter(item => item.learnerId === learnerId);
         },
         async createLearningHistory(newLearningHistory: LearningHistory): Promise<void> {
             stateMap.set(newLearningHistory.id, newLearningHistory);
+        }
+    }
+}
+
+export interface IProficiencyLevelRepository {
+    // query
+    getProficiencyLevelListByLearnerId(learnerId: string): Promise<ProficiencyLevel[]>
+    // mutation
+    saveProficiencyLevel(newProficiencyLevel: ProficiencyLevel): Promise<void>;
+}
+
+export function createFakeProficiencyLevelRepository(initState: Map<string, ProficiencyLevel>): IProficiencyLevelRepository {
+    const stateMap = initState || new Map()
+    return {
+        async getProficiencyLevelListByLearnerId(learnerId: string): Promise<ProficiencyLevel[]> {
+            return [...stateMap.values()]
+                .filter(item => item.learnerId === learnerId);
+        },
+        async saveProficiencyLevel(newProficiencyLevel: ProficiencyLevel): Promise<void> {
+            stateMap.set(newProficiencyLevel.learnerId + "-" + newProficiencyLevel.cardId, newProficiencyLevel);
         }
     }
 }

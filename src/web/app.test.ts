@@ -63,6 +63,8 @@ describe('problems api', () => {
     // given
     expect(await client.get('/problems')).toStrictEqual([YesOrNoProblem]);
 
+    const createdAt = new Date().toISOString();
+
     // when
     expect(
       (
@@ -70,9 +72,21 @@ describe('problems api', () => {
           id: 'solve-1',
           answer: 'O',
           isRight: true,
-          createdAt: new Date().toISOString(),
+          createdAt,
         })
       ).status
     ).toBe(201);
+
+    // 레벨이 올라가서 1이 되었다???
+
+    const testLearnerId = "twinstae";
+    expect(await client.get('/learners/' + testLearnerId + "/proficiency-levels")).toStrictEqual([
+       {
+        learnerId: testLearnerId,
+        cardId: YesOrNoProblem.cardId,
+        value: 1,
+        updatedAt: createdAt
+      }
+    ]);
   });
 });

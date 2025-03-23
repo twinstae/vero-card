@@ -1,12 +1,14 @@
 import { Hono } from 'hono';
 import { describeRoute } from 'hono-openapi';
 import { resolver, validator as vValidator } from 'hono-openapi/valibot';
-import { createFakeLearningHistoryRepository, createFakeProblemRepository } from '../adapters/repository/fake-repositories';
+import { createFakeLearningHistoryRepository, createFakeProblemRepository, createFakeProficiencyLevelRepository } from '../adapters/repository/fake-repositories';
 import * as v from 'valibot';
 import { dateStringSchema, ProblemSchema } from '../adapters/schema';
+import { calculateLevel } from '../domain/level';
 
 const problemRepo = createFakeProblemRepository(new Map());
 const learningHistoryRepo = createFakeLearningHistoryRepository(new Map());
+export const proficiencyLevelRepo = createFakeProficiencyLevelRepository(new Map());
 
 const problemsRoutes = new Hono();
 
@@ -78,8 +80,10 @@ problemsRoutes.post(
     const { problemId }= c.req.valid('param');
     const { id, answer, isRight, createdAt } = c.req.valid('json');
 
-    const problem = await problemRepo.getProblemById(problemId);
+    const learnerId = "twinstae";
 
+    const problem = await problemRepo.getProblemById(problemId);
+    
     if (!problem) {
       return new Response(problemId + ' 문제를 찾을 수 없습니다', { status: 404 });
     }
@@ -87,11 +91,24 @@ problemsRoutes.post(
     await learningHistoryRepo.createLearningHistory({
       id,
       createdAt: new Date(createdAt),
-      cardId: problem?.cardId,
+      cardId: problem.cardId,
       problemId,
       answer,
       isRight,
-      learnerId: "taehee"
+      learnerId
+    })
+
+    // level 을 업데이트하고 영속해주는 코드가 있다
+    const learningHistories = await learningHistoryRepo.getLearningHistoryListByLearnerIdAndCardId({
+      cardId: problem.cardId,
+      learnerId
+    });
+
+    await proficiencyLevelRepo.saveProficiencyLevel({
+      learnerId,
+      cardId: problem.cardId,
+      value: calculateLevel(learningHistories),
+      updatedAt: new Date(createdAt)
     })
 
     return new Response('', { status: 201 });
