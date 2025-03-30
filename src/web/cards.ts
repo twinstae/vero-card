@@ -1,23 +1,23 @@
-import { Hono } from 'hono';
-import { describeRoute } from 'hono-openapi';
-import { resolver, validator as vValidator } from 'hono-openapi/valibot';
-import * as v from 'valibot';
-import { createFakeCardRepository } from '../adapters/repository/fake-repositories';
-import { CardSchema } from '../adapters/schema';
+import { Hono } from "hono";
+import { describeRoute } from "hono-openapi";
+import { resolver, validator as vValidator } from "hono-openapi/valibot";
+import * as v from "valibot";
+import { createFakeCardRepository } from "../adapters/repository/fake-repositories";
+import { CardSchema } from "../adapters/schema";
 
 const cardRepo = createFakeCardRepository(new Map());
 
 const cardsRoutes = new Hono();
 
 cardsRoutes.get(
-  '/cards',
+  "/cards",
   describeRoute({
-    description: '모든 카드 목록을 반환합니다',
+    description: "모든 카드 목록을 반환합니다",
     responses: {
       200: {
-        description: 'Successful response',
+        description: "Successful response",
         content: {
-          'application/json': {
+          "application/json": {
             schema: resolver(v.array(CardSchema)),
           },
         },
@@ -31,25 +31,25 @@ cardsRoutes.get(
 );
 
 cardsRoutes.post(
-  '/cards',
+  "/cards",
   describeRoute({
-    description: '새 카드를 생성합니다',
+    description: "새 카드를 생성합니다",
     responses: {
       201: {
-        description: 'Successfully created!',
+        description: "Successfully created!",
       },
     },
   }),
-  vValidator('json', CardSchema),
+  vValidator("json", CardSchema),
   async (c) => {
-    const newCard = c.req.valid('json');
+    const newCard = c.req.valid("json");
 
     await cardRepo.createCard({
       ...newCard,
       createdAt: new Date(newCard.createdAt),
     });
 
-    return new Response('', { status: 201 });
+    return new Response("", { status: 201 });
   }
 );
 

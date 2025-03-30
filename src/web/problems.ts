@@ -1,28 +1,32 @@
-import { Hono } from 'hono';
-import { describeRoute } from 'hono-openapi';
-import { resolver, validator as vValidator } from 'hono-openapi/valibot';
-import { createFakeLearningHistoryRepository, createFakeProblemRepository } from '../adapters/repository/fake-repositories';
-import * as v from 'valibot';
-import { dateStringSchema, ProblemSchema } from '../adapters/schema';
+import { Hono } from "hono";
+import { describeRoute } from "hono-openapi";
+import { resolver, validator as vValidator } from "hono-openapi/valibot";
+import {
+  createFakeLearningHistoryRepository,
+  createFakeProblemRepository,
+} from "../adapters/repository/fake-repositories";
+import * as v from "valibot";
+import { dateStringSchema, ProblemSchema } from "../adapters/schema";
 
 const problemRepo = createFakeProblemRepository(new Map());
 const learningHistoryRepo = createFakeLearningHistoryRepository(new Map());
 
 const problemsRoutes = new Hono();
 
-problemsRoutes.get('/problems',
+problemsRoutes.get(
+  "/problems",
   describeRoute({
-    description:'모든 문제 목록을 반환합니다.',
-    response:{
-      200:{
-        description:'Successful response',
-        content:{
-          'application/json':{
-            schema: resolver(v.array(ProblemSchema))
-          }
-        }
-      }
-    }
+    description: "모든 문제 목록을 반환합니다.",
+    response: {
+      200: {
+        description: "Successful response",
+        content: {
+          "application/json": {
+            schema: resolver(v.array(ProblemSchema)),
+          },
+        },
+      },
+    },
   }),
   async (c) => {
     const problemList = await problemRepo.getAllProblemList();
@@ -30,20 +34,19 @@ problemsRoutes.get('/problems',
   }
 );
 
-
 problemsRoutes.post(
-  '/problems',
+  "/problems",
   describeRoute({
-    description: '새 문제를 생성합니다',
+    description: "새 문제를 생성합니다",
     responses: {
       201: {
-        description: 'Successfully created!',
+        description: "Successfully created!",
       },
     },
   }),
-  vValidator('json', ProblemSchema),
+  vValidator("json", ProblemSchema),
   async (c) => {
-    const newProblem = c.req.valid('json');
+    const newProblem = c.req.valid("json");
 
     await problemRepo.createProblem({
       ...newProblem,
@@ -51,37 +54,44 @@ problemsRoutes.post(
       updatedAt: new Date(newProblem.updatedAt),
     });
 
-    return new Response('', { status: 201 });
+    return new Response("", { status: 201 });
   }
 );
 
 problemsRoutes.post(
-  '/problems/:problemId/solve',
+  "/problems/:problemId/solve",
   describeRoute({
-    description: '어떤 문제 하나를 학습합니다',
+    description: "어떤 문제 하나를 학습합니다",
     responses: {
       201: {
-        description: 'Successfully created!',
+        description: "Successfully created!",
       },
     },
   }),
-  vValidator("param", v.object({
-    problemId: v.string(),
-  })),
-  vValidator('json', v.object({
-    id: v.string(),
-    answer: v.string(),
-    isRight: v.boolean(),
-    createdAt: dateStringSchema
-  }) ),
+  vValidator(
+    "param",
+    v.object({
+      problemId: v.string(),
+    })
+  ),
+  vValidator(
+    "json",
+    v.object({
+      id: v.string(),
+      answer: v.string(),
+      isRight: v.boolean(),
+      createdAt: dateStringSchema,
+    })
+  ),
   async (c) => {
-    const { problemId }= c.req.valid('param');
-    const { id, answer, isRight, createdAt } = c.req.valid('json');
+    console.log(c.req.valid("json"));
+    const { problemId } = c.req.valid("param");
+    const { id, answer, isRight, createdAt } = c.req.valid("json");
 
     const problem = await problemRepo.getProblemById(problemId);
 
     if (!problem) {
-      return new Response(problemId + ' 문제를 찾을 수 없습니다', { status: 404 });
+      return new Response(problemId + " 문제를 찾을 수 없습니다", { status: 404 });
     }
 
     await learningHistoryRepo.createLearningHistory({
@@ -91,10 +101,10 @@ problemsRoutes.post(
       problemId,
       answer,
       isRight,
-      learnerId: "taehee"
-    })
+      learnerId: "taehee",
+    });
 
-    return new Response('', { status: 201 });
+    return new Response("", { status: 201 });
   }
 );
 
