@@ -22,30 +22,30 @@ async function loadFileStore<T>(name: string) {
 }
 
 export async function createFsCardRepository(): Promise<ICardRepository> {
-  const store = await loadFileStore<Card>("cards");
-  return {
-    async getAllCardList(): Promise<Card[]> {
-      return [...store.values()];
-    },
-    async createCard(newCard: Card): Promise<void> {
-      store.set(newCard.id, newCard);
-    },
-  };
+    const store = await loadFileStore<Card>("cards");
+    return {
+        async getAllCardList(): Promise<Card[]> {
+            return [...store.values()];
+        },
+        async createCard(newCard: Card): Promise<void> {
+            return store.set(newCard.id, newCard);
+        }
+    }
 }
 
 export async function createFsProblemRepository(): Promise<IProblemRepository> {
-  const store = await loadFileStore<Problem>("problems");
-  return {
-    async getAllProblemList(): Promise<Problem[]> {
-      return [...store.values()];
-    },
-    async getProblemById(problemId) {
-      return store.get(problemId);
-    },
-    async createProblem(newProblem: Problem): Promise<void> {
-      store.set(newProblem.id, newProblem);
-    },
-  };
+    const store = await loadFileStore<Problem>("problems");
+    return {
+        async getAllProblemList(): Promise<Problem[]> {
+            return [...store.values()];
+        },
+        async getProblemById(problemId) {
+            return store.get(problemId);
+        },
+        async createProblem(newProblem: Problem): Promise<void> {
+            return store.set(newProblem.id, newProblem);
+        }
+    }
 }
 
 export async function createFsLearningHistoryRepository(
@@ -53,17 +53,22 @@ export async function createFsLearningHistoryRepository(
 ): Promise<ILearningHistoryRepository> {
   const store = await loadFileStore<LearningHistory>("learning-histories");
 
-  return {
-    async getLearningHistoryListByLearnerId(learnerId: string): Promise<LearningHistory[]> {
-      return [...store.values()].filter((item) => item.learnerId === learnerId);
-    },
-    async getLearningHistoryListByCardIdAndLearnerId(cardId: string, learnerId: string): Promise<LearningHistory[]> {
-      return [...store.values()]
-        .filter((item) => item.cardId === cardId)
-        .filter((item) => item.learnerId === learnerId);
-    },
-    async createLearningHistory(newLearningHistory: LearningHistory): Promise<void> {
-      store.set(newLearningHistory.id, newLearningHistory);
-    },
-  };
+
+export async function createFsLearningHistoryRepository(initState: Map<string, LearningHistory>): Promise<ILearningHistoryRepository> {
+    const store = await loadFileStore<LearningHistory>("learning-histories");
+
+    return {
+        async getLearningHistoryListByLearnerId(learnerId: string): Promise<LearningHistory[]> {
+            return [...store.values()]
+                .filter(item => item.learnerId === learnerId);
+        },
+        async getLearningHistoryListByCardIdAndLearnerId(cardId: string, learnerId: string): Promise<LearningHistory[]> {
+            return [...store.values()]
+                .filter(item => item.cardId === cardId)
+                .filter(item => item.learnerId === learnerId);
+        },
+        async createLearningHistory(newLearningHistory: LearningHistory): Promise<void> {
+            return store.set(newLearningHistory.id, newLearningHistory);
+        }
+    }
 }

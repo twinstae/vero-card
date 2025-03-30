@@ -1,28 +1,29 @@
-export type SolutionRecord = {
+import type { LearningHistory } from "./learning-history";
+
+export type ProficiencyLevelValue = 0 | 1 | 2 | 3 | 4 | 5;
+
+export type ProficiencyLevel = {
   learnerId: string;
-  problemId: string;
   cardId: string;
-  result: 'correct' | 'wrong';
-  solvedAt: Date;
-};
+  value: ProficiencyLevelValue;
+  updatedAt: Date;
+}
 
-export type ProficiencyLevel = 0 | 1 | 2 | 3 | 4 | 5;
-
-export function assertValidProficiencyLevel(n: number): ProficiencyLevel {
+export function assertValidProficiencyLevel(n: number): ProficiencyLevelValue {
   if ([0, 1, 2, 3, 4, 5].includes(n)) {
-    return n as ProficiencyLevel;
+    return n as ProficiencyLevelValue;
   }
 
   throw Error(n + '은 0,1,2,3,4,5 가 아닙니다!');
 }
 
 export function calculateLevel(
-  solutionRecordList: SolutionRecord[]
-): ProficiencyLevel {
-  return [...solutionRecordList]
-    .sort((a, b) => a.solvedAt.valueOf() - b.solvedAt.valueOf())
-    .reduce((acc, solutionRecord) => {
-      if (solutionRecord.result === 'correct') {
+  learningHistoryList: LearningHistory[]
+): ProficiencyLevelValue {
+  return [...learningHistoryList]
+    .sort((a, b) => a.createdAt.valueOf() - b.createdAt.valueOf())
+    .reduce((acc, learningHistory) => {
+      if (learningHistory.isRight === true) {
         if (acc >= 5) {
           return 5;
         }
@@ -30,7 +31,7 @@ export function calculateLevel(
         return assertValidProficiencyLevel(acc + 1);
       }
 
-      if (solutionRecord.result === 'wrong') {
+      if (learningHistory.isRight === false) {
         if (acc <= 0) {
           return 0;
         }
@@ -39,5 +40,5 @@ export function calculateLevel(
       }
 
       return acc;
-    }, 0 as ProficiencyLevel);
+    }, 0 as ProficiencyLevelValue);
 }
